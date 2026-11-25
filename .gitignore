@@ -1,0 +1,14 @@
+.tools/
+.venv/
+.cache/
+__pycache__/
+assets/
+work/
+*.pyc
+drive-download-*/
+drive-download-*.zip
+results/*.sqlite*
+results/data/development.json
+results/data/heldout.json
+results/analysis/examples.json
+results/runs/gpu_budget.json

@@ -1,0 +1,102 @@
+{
+  "precision": "nf4",
+  "heldout_judgments": 6000,
+  "development_judgments": 1200,
+  "gpu_hours_charged": 0.15059000000001915,
+  "heldout_hours_charged": 0.11085527777778528,
+  "heldout_equal_top_logits": 26,
+  "selection": {
+    "development": {
+      "rows": 20,
+      "sources": {
+        "ScienceQA": 8,
+        "GSM8K": 6,
+        "MATH": 6
+      },
+      "verified_sources": {},
+      "reference_status": {
+        "ambiguous_candidate_conclusion": 15,
+        "both_match": 4,
+        "unsupported_source_answer": 1
+      },
+      "verbosity_provenance": {
+        "verbatim duplicate": 20
+      },
+      "target_answer": {
+        "answer2": 20
+      },
+      "requested_quotas": {
+        "GSM8K": 6,
+        "MATH": 6,
+        "ScienceQA": 8
+      },
+      "manifest_sha256": "f52fef03744831a562b129570119ab734e76abf4c7a641fc4a10d08b95364691"
+    },
+    "heldout": {
+      "rows": 100,
+      "sources": {
+        "ScienceQA": 40,
+        "GSM8K": 31,
+        "MATH": 29
+      },
+      "verified_sources": {},
+      "reference_status": {
+        "ambiguous_candidate_conclusion": 77,
+        "both_match": 19,
+        "unsupported_source_answer": 4
+      },
+      "verbosity_provenance": {
+        "verbatim duplicate": 100
+      },
+      "target_answer": {
+        "answer2": 100
+      },
+      "requested_quotas": {
+        "GSM8K": 31,
+        "MATH": 29,
+        "ScienceQA": 40
+      },
+      "manifest_sha256": "bbf9222bb767941a763f898b05652aaeb87092ce96f7845202fe66fe5c7b6d53"
+    },
+    "screening": {
+      "ScienceQA": {
+        "upstream": 201,
+        "ineligible_edit": 48,
+        "eligible": 138,
+        "ineligible_text": 11,
+        "no_unique_text_source_match": 4
+      },
+      "GSM8K": {
+        "upstream": 156,
+        "eligible": 99,
+        "ineligible_text": 11,
+        "ineligible_edit": 35,
+        "no_unique_text_source_match": 11
+      },
+      "MATH": {
+        "upstream": 143,
+        "eligible": 106,
+        "ineligible_text": 25,
+        "ineligible_edit": 12
+      }
+    }
+  },
+  "forecast": {
+    "precision": "nf4",
+    "by_model": {
+      "Qwen3-0.6B": {
+        "pilot_p95_ms": 67.3675800091587,
+        "forecast_wall_seconds": 510.9084800549318
+      },
+      "Qwen3-1.7B": {
+        "pilot_p95_ms": 65.65754504990764,
+        "forecast_wall_seconds": 498.7262702994048
+      },
+      "Qwen3-4B": {
+        "pilot_p95_ms": 55.7516350003425,
+        "forecast_wall_seconds": 441.009810002055
+      }
+    },
+    "total_seconds": 1450.6445603563916
+  }
+}

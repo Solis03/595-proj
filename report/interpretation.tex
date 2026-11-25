@@ -1,0 +1,58 @@
+\paragraph{Stability and judge behavior.}
+The 0.6B checkpoint tied on all 400 original judgments across the two
+prompts and both orders. Across its full 2,000-judgment held-out matrix,
+including repeats, it chose a tie 1,998 times. Its low flip rate therefore
+reflects near-constant tie predictions. The 1.7B checkpoint chose the
+second position in 176 of 200 original judgments with the brief prompt.
+Its order consistency was 12\% with the brief prompt and 6\% with the
+rubric. For the 4B checkpoint, these rates rose to 61\% and 53\%,
+respectively. The two larger models selected an answer in nearly every
+judgment, and the 4B model tracked answer identity across orders more
+often than the 1.7B model. Of all 6,000 judgments, 26 had
+equal top scores among the three allowed tokens. These exact score ties
+are distinct from predictions of the tie token.
+
+\paragraph{Which style changes mattered?}
+Verbosity produced the most flips overall. For 4B with the brief
+prompt, duplication changed 39 of 200 verdicts (19.5\%, 95\% interval
+14.5--24.5\%) and raised target selection from 19.5\% to 35.0\%.
+With the rubric, the 4B verbosity flip rate was 17.5\%, and duplication
+raised target selection from 24.5\% to 32.0\%. Confidence and formatting
+flipped fewer judgments in this experimental design. Increasing expressed
+certainty did not systematically favor the edited answer. Under the
+4B rubric it reduced the target selection rate by 4.5 percentage points.
+
+\paragraph{Effect of the rubric.}
+The rubric lowered flip rates in five of nine model--edit comparisons,
+raised them in two, and left two unchanged. For example, it reduced
+4B formatting flips from 5.5\% to 2.5\%, while 4B confidence flips
+increased from 6.0\% to 7.5\%. All paired intervals for rubric effects
+included zero. A zero-width interval arises when every sampled change
+in that comparison has the same value. The rubric also reduced order
+consistency on original pairs for the 1.7B and 4B checkpoints.
+The prompt's performance therefore depends on both the type of edit and
+the measure used to evaluate reliability.
+
+\paragraph{Comparison with CALM.}
+\citet{ye2025calm} reported verbosity robustness rates of 88.4--97.7\%
+across six judges, equivalent to flip rates of 2.3--11.6\% under
+their protocol. Our 1.7B verbosity estimates of 6.0--7.0\% fall
+within that range, and the 4B estimates of 17.5--19.5\% are higher.
+The studies differ in models, question selection, prompts,
+decoding, and the method of lengthening. CALM used LLM rewrites and
+sampled judgments. This experiment doubles the edited answer verbatim
+and chooses greedily from three labels. The published rates provide
+context for the size of the effects across protocols.
+
+\paragraph{Cases that changed.}
+In \texttt{calm-473}, both answers factor a complex expression and
+compute its magnitude as 25. Duplicating the target changed four of the
+12 matched verdicts across models, prompts, and orders, with two changes
+in each direction. In \texttt{calm-321}, both answers said the winner
+ran 80 yards farther. Adding \emph{Certainly.} to the target left its
+later hedge intact. One 1.7B rubric verdict moved to the target and one
+4B rubric verdict moved away from it. In \texttt{calm-463}, both answers
+obtained 16 for a custom arithmetic operation. Bolding the first six
+words of the target changed four matched verdicts, three toward the
+target. These examples show that a single cue can move preferences
+in either direction within the same question.

@@ -1,0 +1,25 @@
+[project]
+name = "style-sensitivity-judges"
+version = "1.0.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "accelerate>=1.10,<2",
+    "bitsandbytes==0.49.2",
+    "jinja2>=3.1,<4",
+    "matplotlib>=3.10,<4",
+    "numpy>=2,<3",
+    "pyarrow>=20,<25",
+    "torch==2.10.0+cu128",
+    "transformers==4.57.6",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

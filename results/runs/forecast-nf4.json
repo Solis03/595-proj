@@ -1,0 +1,18 @@
+{
+  "precision": "nf4",
+  "by_model": {
+    "Qwen3-0.6B": {
+      "pilot_p95_ms": 67.3675800091587,
+      "forecast_wall_seconds": 510.9084800549318
+    },
+    "Qwen3-1.7B": {
+      "pilot_p95_ms": 65.65754504990764,
+      "forecast_wall_seconds": 498.7262702994048
+    },
+    "Qwen3-4B": {
+      "pilot_p95_ms": 55.7516350003425,
+      "forecast_wall_seconds": 441.009810002055
+    }
+  },
+  "total_seconds": 1450.6445603563916
+}

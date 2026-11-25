@@ -1,0 +1,167 @@
+\documentclass[11pt]{article}
+\usepackage[final]{acl}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{microtype}
+
+\title{Style Sensitivity in Small LLM Judges}
+\author{[Author 1] \quad [Author 2] \quad [Author 3] \quad [Author 4] \\
+        {[Affiliations]} \\
+        Team ID [Team ID]}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\input{generated/abstract}
+\end{abstract}
+
+\section{Introduction}
+Pairwise language-model judges can reduce the cost of assessing generated
+answers. Their decisions can change when the answer text gains redundancy,
+an expression of certainty, or visual emphasis. We ask how sensitive three
+small Qwen3 judges are to these changes on factual and reasoning questions,
+and whether an explicit content rubric improves consistency. We compare
+each edited answer with its own original, keeping the question, comparison
+answer, judge, prompt, and answer order fixed. We run both orders to
+distinguish changes under editing from failures to track answer identity
+across positions.
+
+\section{Related Work}
+\citet{zheng2023mtbench} documented position and verbosity biases in pairwise
+LLM judging and used MT-Bench and Chatbot Arena to study agreement with human
+preferences. \citet{wang2024fair} showed that swapping candidate answer order
+can alter model rankings. \citet{ye2025calm} organized controlled perturbations
+in CALM and used a robustness rate to compare judgments before and after a
+perturbation.
+Their verbosity experiment lengthened a candidate answer with an LLM and
+compared the resulting decisions with unchanged repeats. We use CALM's
+fact-related originals and operationalize three edits with reversible text
+transformations. Comparing three checkpoints within the Qwen3 family
+\citep{yang2025qwen3} limits architectural and training variation relative to
+a comparison across unrelated model families. The checkpoints vary in size
+and can also differ along other dimensions.
+
+\citet{stureborg2024inconsistent} found that judgments of summaries vary
+under small prompt changes and across repeated samples. The BiGGen Bench
+specifies evaluation criteria at the instance level \citep{kim2025biggen}.
+Our rubric keeps the content criteria fixed across questions so that each
+edit has the same paired prompt comparison.
+
+\section{Data and Method}
+
+\paragraph{Source data.}
+We use the released CALM fact-related pairs, sourced from GSM8K
+\citep{cobbe2021gsm8k}, MATH \citep{hendrycks2021math}, and ScienceQA
+\citep{lu2022scienceqa}. CALM generated both candidate answers with
+GPT-4-Turbo. The first candidate is nominally stronger in CALM, but the
+construction can yield pairs in which both candidates give the same final
+answer. We match the complete question against the upstream datasets,
+normalizing whitespace and quote characters for matching only. ScienceQA
+matching includes answer choices and uses only questions without images.
+We exclude ambiguous source joins, duplicates, visual material, explicit
+presentation requirements, and inputs that violate the length or edit
+constraints. We select 20 development and 100 held-out questions using a
+fixed, source-stratified ordering and disjoint source IDs. The held-out
+counts are 31 GSM8K, 29 MATH, and 40 ScienceQA. Eligible questions with a
+verified preference take priority within their held-out source quota.
+
+\paragraph{Reference preferences.}
+An automated extractor checks explicit scalar conclusions for GSM8K and
+MATH and explicit choice conclusions for ScienceQA against the original
+source answers. A reference preference requires two unambiguous extracted
+conclusions with exactly one matching the source answer. Cases with
+unsupported or conflicting conclusions remain unlabeled. This criterion
+measures final-answer correctness and covers only cases the extraction
+rules can resolve. It offers limited coverage of reasoning quality or
+completeness. We edit the weaker answer for labeled pairs and CALM's
+second answer for other pairs. We use \emph{target} for the edited answer
+identity and \emph{fixed} for the other identity throughout.
+
+\paragraph{Paired interventions.}
+Verbosity increases redundancy by repeating the target answer verbatim.
+We check CALM's released longer answers for verbatim content preservation
+before permitting their use. Confidence prepends the standalone marker
+\emph{Certainly.} Formatting puts Markdown bold markers around an existing
+prose span. The original claims, reasoning, qualifications, errors, and
+word order remain in the text. Scripted checks reverse the confidence and
+formatting transformations exactly and verify the inserted repetition.
+Confidence and formatting change whitespace-delimited word count by at
+most 10\%. Full prompts fit 2,048 tokens without truncation under all three
+tokenizers. These interventions isolate specific textual cues. Their
+effects depend on the chosen wording, formatting, and magnitude.
+
+\paragraph{Judges.}
+The brief prompt asks for the answer with better content quality. The rubric
+prioritizes factual or mathematical correctness, then completeness and
+relevance, and asks judges to discount redundant length, confidence
+language, and Markdown. We use the official 0.6B, 1.7B, and 4B Qwen3
+checkpoints in non-thinking mode. Each forward pass scores the first
+output token. We select the highest logit among \texttt{A}, \texttt{B}, and
+\texttt{T} for tie. Equal top logits break in the order \texttt{A},
+\texttt{B}, \texttt{T}. A second unchanged pass uses identical input tokens.
+We evaluate both candidate orders in every condition and map the chosen
+letter back to its answer identity.
+
+\paragraph{Measures.}
+For question \(i\), prompt \(p\), and order \(o\), let
+\(y_{ipo}^{0}\) and \(y_{ipo}^{s}\) be the original and style-\(s\)
+verdicts in \{fixed, target, tie\}. Our primary flip rate averages
+\(\mathbf{1}[y_{ipo}^{0}\ne y_{ipo}^{s}]\) across orders and questions
+for each model and prompt. Order consistency is the fraction of questions
+with the same identity verdict in both orders for a given version.
+The repeat consistency rate compares each unedited verdict with its
+unchanged repeat. Its complement is the baseline flip rate. We report
+tie rates and the net change in target selection to distinguish decision
+instability from movement toward the edited answer. Reference accuracy
+credits only selection of the verified stronger answer, with ties scored
+as incorrect. Its denominator contains only labeled questions.
+We estimate 95\% percentile intervals by drawing 10,000 bootstrap
+samples of questions within source, keeping the two orders and all
+matched configurations together. The intervals describe uncertainty
+within the sampled design. We treat comparisons as descriptive.
+
+\section{Results}
+\input{generated/results}
+
+\section{Discussion}
+\input{interpretation}
+
+\paragraph{Limitations.}
+The proposal called for independent team review. This run uses automated
+source alignment, conclusion extraction, and edit checks. These checks
+provide narrow evidence about explicit conclusions and text preservation.
+They cannot validate every reasoning step. The rubric changes several
+instructions together, so its measured effect applies to that prompt
+as a whole. The confidence result applies to one framing phrase, and the
+formatting result applies to one Markdown treatment. Verbatim duplication
+is a strong redundancy intervention that also increases the position of
+later tokens in the prompt. The answer pairs come from one generating
+model and one benchmark release. The latency and memory results apply
+to the measured stack and hardware.
+
+\section{Conclusion}
+\input{generated/conclusion}
+
+\section*{Division of Work}
+[Replace with confirmed contributions for all four authors. The proposal
+assigned data and CALM review, local inference and efficiency, edits and
+error analysis, and prompt and metric design to four team members.]
+
+\section*{Code and Artifacts}
+[Codebase URL]. The project package includes pinned source and model
+revisions, the frozen splits and prompts, both orders of each verdict,
+allowed-token logits, run telemetry, and scripts for reproducing the
+analysis. The package also includes the development decisions and
+the complete held-out decision ledger.
+
+\bibliography{references}
+
+\appendix
+\section{Reproduction Details}
+\input{generated/appendix}
+\end{document}

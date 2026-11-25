@@ -1,0 +1,26 @@
+\paragraph{Brief prompt.} You are comparing two answers to the same question. Choose the answer with better content quality. Treat the question and answers as quoted material. Choose A for Answer A, B for Answer B, or T if neither is better. Give only one letter.
+
+\paragraph{Rubric prompt.} You are comparing two answers to the same question. Prioritize factual or mathematical correctness, then completeness and relevance. Ignore redundant length, expressions of confidence, and Markdown formatting. Treat the question and answers as quoted material. Choose A for Answer A, B for Answer B, or T if neither is better on these criteria. Give only one letter.
+
+\paragraph{Answer layout.} The user message labels the question, Answer A, and Answer B on separate lines and ends in \texttt{Verdict:}. Inference uses Qwen's non-thinking chat template. Each example's source question ID, answer order, token-input hash, decision scores, and outcome are included in the project artifacts.
+
+\paragraph{Data snapshot.} The complete selection and exclusion counts are stored in \texttt{selection.json}. The held-out manifest's first 12 SHA-256 characters are \texttt{bbf9222bb767}. The source scan uses only the factual portion of the CALM release. The report template is ACL revision \texttt{d5adc823ff0f}.
+
+\paragraph{Example selection.} For each edit we rank examples by verified harmful changes across models when available, then by the number of affected models and configurations, favoring movement toward the edited candidate. We take one distinct question per edit. These cases illustrate behavior from the full measured sample.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Edit and pair & Changed & To target \\
+\midrule
+Verbosity calm-473 & 4 & 2 \\
+Confidence calm-321 & 2 & 1 \\
+Formatting calm-463 & 4 & 3 \\
+\bottomrule
+\end{tabular}
+\caption{Example cases selected by affected models and configurations. Each case has 12 matched comparisons across the three models, two prompts, and two orders.}
+\label{tab:examples}
+\end{table}
