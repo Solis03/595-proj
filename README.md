@@ -1,6 +1,6 @@
 # Style Sensitivity in Small LLM Judges
 
-This CSE 595 project tests whether redundancy, confidence language, and Markdown emphasis change pairwise judgments on CALM questions. The experiment uses official Qwen3 0.6B, 1.7B, and 4B checkpoints, two prompts, both answer orders, and an unchanged repeat. The held-out run comprises 6,000 judgments.
+This CSE 595 project evaluates how redundancy, confidence language, and Markdown emphasis affect pairwise judgments by Qwen3-0.6B, 1.7B, and 4B. CALM measures verdict stability across 323 questions. JudgeBench measures accuracy and error transitions on 462 labeled pairs. The study compares both answer orders, two prompts, and a matched NF4 and BF16 subset.
 
 ## Reproduce on Windows
 
@@ -14,12 +14,21 @@ uv sync --locked --managed-python --python 3.12
 $python = '.\.venv\Scripts\python.exe'
 & $python -m style_judges.sources data
 & $python -m style_judges.sources models
+& $python -m style_judges.extension fetch
 & $python -m unittest discover -s tests -v
+~~~
+
+Run the evaluation and regenerate the unified report tables.
+
+~~~powershell
 & $python -m style_judges prepare
 & $python -m style_judges run development nf4
 & $python -m style_judges run heldout nf4
 & $python -m style_judges analyze --precision nf4
-& $python -m style_judges.report
+& $python -m style_judges.extension prepare
+& $python -m style_judges.extension run
+& $python -m style_judges.extension analyze
+& $python -m style_judges.extension_report
 ~~~
 
 For a slow or interrupted full PyTorch transfer, run the following before installing the local wheel. The downloader retains completed ranges and validates the reconstructed file against the PyTorch index's SHA-256.
@@ -31,44 +40,24 @@ $python = '.\.venv\Scripts\python.exe'
 uv pip install --python $python --no-deps '.\assets\wheels\torch-2.10.0+cu128-cp312-cp312-win_amd64.whl'
 ~~~
 
-Use the same precision for both phases and analysis. If NF4 fails the CUDA preflight, the supported fallback is BF16 for all three checkpoints. The supervisor resumes from persisted decision keys and records process elapsed time in a shared 24 GPU-hour ledger. Held-out inference checks the corresponding complete development run and its throughput forecast before launch.
+The supervisor resumes from saved judgment keys and records GPU worker time. The report generator reads both CALM judgment exports and the JudgeBench results.
 
 ## Results and report
 
-- [Data selection](results/data/selection.json) records source counts and manifest hashes. The preparation command recreates the exact split manifests from the pinned upstream snapshots.
-- [Experiment results](results) contains the CSV judgment exports and timing and memory logs. Local inference also writes a resumable SQLite ledger and a GPU time ledger.
-- [Analysis](results/analysis) contains clustered estimates, transitions, and runtime summaries. The analysis command also recreates the case-study data locally.
-- [Final ACL report](output/pdf/final_project.pdf) contains the measured comparison, case studies, and limitations.
-- [Report source](report/final_project.tex) uses the ACL final style. Author information, team ID, contribution statement, and code URL are marked for the team to replace.
+- [Final ACL report](output/pdf/final_project_extended.pdf) covers verdict stability, correctness, and the effects of prompts, decoding, and precision.
+- [Editable report source](report/final_project_extended.tex) uses the ACL final style. Author information, team ID, and contribution details are marked for the team to replace.
+- [Judgment exports and analysis](results) include model scores, metric estimates, and runtime summaries. The [joint CALM and JudgeBench outputs](results/extension) also record source-question groups and JudgeBench answer labels. Preparation recreates the split manifests from pinned upstream data.
 
 To build the report from the generated LaTeX fragments, run Tectonic from the report directory. The final report includes the result plot and works with compatible local LaTeX installations as well.
 
 ~~~powershell
 Push-Location report
-try { & ..\work\latex\tectonic.exe -X compile final_project.tex }
+try { & ..\work\latex\tectonic.exe -X compile final_project_extended.tex }
 finally { Pop-Location }
 ~~~
 
 The source command `python -m style_judges.sources report` downloads the pinned ACL files and the Windows Tectonic zip into `work/latex`. Extract the executable into the same directory before compiling.
 
-## Six-hour correctness extension
-
-The extension applies the same style edits to either the correct or incorrect JudgeBench response. It also evaluates fresh CALM pairs and runs a matched BF16 check when the pilot and remaining budget allow it. The supervisor charges the original run against the six-hour cap and resumes from persisted case keys.
-
-~~~powershell
-$python = '.\.venv\Scripts\python.exe'
-& $python -m style_judges.extension fetch
-& $python -m style_judges.extension prepare
-& $python -m style_judges.extension run
-& $python -m style_judges.extension analyze
-& $python -m style_judges.extension_report
-Push-Location report
-try { & ..\work\latex\tectonic.exe -X compile final_project_extended.tex }
-finally { Pop-Location }
-~~~
-
-The extension uses the same pinned Qwen checkpoints and CALM inputs from the original setup. Its [results](results/extension) include judgment CSVs with question groups, label identities, and token hashes. The case-study text and raw manifests are generated locally. The revised report is available as [a PDF](output/pdf/final_project_extended.pdf) and [editable ACL source](report/final_project_extended.tex).
-
 ## Sources
 
-The CALM release supplies the original answer pairs. Original GSM8K, MATH, and ScienceQA solutions are used only by the data preparation step. Model inputs contain the question and two candidate answers. The report bibliography lists the dataset and benchmark papers.
+CALM supplies candidate answers to questions from GSM8K, MATH, and ScienceQA. JudgeBench supplies answer pairs and published correctness labels. The judges receive only the question and two candidate answers. The report bibliography lists the dataset and benchmark papers.

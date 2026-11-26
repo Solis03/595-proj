@@ -1,13 +1,12 @@
-\paragraph{Net accuracy hides opposing changes.}
-In the primary contrast, incorrect-answer duplication moved 94 of
-499 initially correct 4B verdicts to the incorrect answer, and one to
-a tie. The same edit recovered 88 initially incorrect verdicts. The
-resulting net accuracy loss was small and its interval included zero.
-The conditional error rate captures a failure that the aggregate
-accuracy comparison obscures. The fresh CALM measurement supports this
-distinction. Duplication flipped 24.0\% of 4B brief-prompt verdicts,
-compared with 19.5\% in the original sample. The CALM pairs provide
-evidence of instability on a separate benchmark.
+\paragraph{Opposing changes can cancel.}
+The CALM flip rates show that duplication frequently changes which
+answer the judge prefers. JudgeBench reveals the consequences of
+those changes. In the primary comparison, duplicating the incorrect
+answer introduced 94 wrong judgments and one tie among previously
+correct verdicts, and recovered 88 previously incorrect verdicts.
+These opposing transitions explain why the aggregate accuracy moved
+only half a percentage point. For a system that uses the judge to make
+individual choices, both directions matter.
 
 \paragraph{The rubric changes which side benefits.}
 With ordered scoring, the 4B rubric reduces accuracy by 9.0 points

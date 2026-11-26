@@ -19,22 +19,21 @@
 
 \section{Introduction}
 Small language models offer a fast way to judge candidate answers. When
-presentation changes a verdict, the consequence depends on whether the
-original and edited verdicts select the correct answer. In our initial
-100-question CALM experiment, duplicating one answer changed 19.5\% of
-Qwen3-4B verdicts under a short prompt. The automatic label checks did
-not establish which answer was better in any of those pairs. The
-0.6B checkpoint also tied on every original comparison, making flip
-rate alone hard to interpret.
+the phrasing or structure of an answer changes, the judge may favor a
+different candidate even when the answers make the same claims as before.
+Such a flip can introduce an error, correct an earlier error, or produce
+a tie. We ask how frequently small Qwen3 judges change their verdicts,
+how those changes affect correctness, and how the judging prompt and
+decoding rule influence both outcomes.
 
-We extend the study with \GoldPairs{} JudgeBench answer pairs with
-correctness labels and \CalmPairs{} new CALM questions. In JudgeBench
-we apply each presentation edit to either candidate in separate
-trials. This lets us measure whether the same edit favors a correct
-answer, an incorrect answer, or neither consistently. We also measure
-the effect of a content rubric and of pooling judgments from both answer
-orders. The experiments use the same three locally available Qwen3
-checkpoints and retain the original CALM protocol for replication.
+We study the same presentation edits on \CalmPairs{} CALM questions
+and \GoldPairs{} labeled JudgeBench answer pairs. CALM measures how
+often the judge changes its preference. JudgeBench shows whether that
+preference moves toward or away from the correct answer. Within
+JudgeBench, we apply each edit to either candidate in separate trials,
+so we can compare the effects of styling the correct and incorrect
+answers. We also compare a content rubric, pooling across answer orders,
+and two weight precisions.
 
 \section{Related Work}
 \citet{zheng2023mtbench} reported position and verbosity effects in
@@ -50,6 +49,14 @@ toward or away from the correct answer.
 
 \section{Data and Method}
 
+\paragraph{CALM.}
+We use \CalmPairs{} held-out, text-only response pairs from the factual
+CALM subset, drawn from GSM8K, MATH, and ScienceQA. We evaluate
+same-order verdict flips, agreement across answer orders, and how often
+the judge chooses an answer. These comparisons use the identity of each
+candidate and require no correctness label. An unchanged-input
+repeat check covers 100 CALM pairs.
+
 \paragraph{JudgeBench.}
 We use the pinned GPT-4o and Claude-3.5-Sonnet response sets and their
 published binary correctness labels. We use the benchmark labels as the
@@ -64,24 +71,17 @@ domain-stratified ordering. The held-out \GoldPairs{} pairs span
 \GoldQuestions{} source-question groups across the two response
 generators. The analysis weights source questions equally.
 
-\paragraph{Fresh CALM replication.}
-We reconstruct the original eligibility rules and retain \CalmPairs{}
-pairs outside both original splits. The new CALM run uses the original,
-verbosity, confidence, and formatting conditions with the same 2,048-token
-limit. We estimate verdict flips and order consistency on this cohort.
-JudgeBench supplies the correctness estimates.
-
-\paragraph{Mirrored edits.}
-For each labeled pair, we construct six single-answer variants by applying
-one of three edits to either the correct or the incorrect answer. We
-repeat the answer verbatim, prepend the one-word confidence marker
+\paragraph{Style interventions.}
+We repeat an answer verbatim, prepend the one-word confidence marker
 \emph{Certainly.}, or add Markdown bold delimiters around an existing
 prose span. These transformations preserve the original answer text,
-including any error or hedge. A seventh variant repeats both answers,
-which tests what happens when redundancy is added on both sides. The
-original and seven variants make eight conditions per pair. Every
-JudgeBench input fits within 4,096 tokens under both prompts and both
-answer orders. Each case retains all original content.
+including any error or hedge. Each CALM pair appears unedited and with
+each style applied to the designated candidate. Each JudgeBench pair
+appears unedited and with each style applied to the correct or incorrect
+answer separately. An eighth JudgeBench condition duplicates both
+answers, providing a control for redundancy on both sides. Every
+fully rendered input fits the dataset's token limit under both prompts
+and both orders, with 2,048 tokens for CALM and 4,096 for JudgeBench.
 
 \paragraph{Judges and decoding.}
 We evaluate Qwen3-0.6B, 1.7B, and 4B \citep{yang2025qwen3} on an RTX
@@ -103,8 +103,10 @@ it for each order and for the mean of the two-order probabilities.
 Pooling uses two forward passes. The forced-choice variants reuse
 the recorded passes.
 
-\paragraph{Estimands.}
-Our primary contrast is the reduction in accuracy from original to
+\paragraph{Measures.}
+We count a CALM flip when the verdict changes after an edit for the
+same question and answer order. On JudgeBench, our primary contrast
+is the change in accuracy from the unedited pair to
 incorrect-answer duplication for the 4B judge using the brief prompt
 and ordered A/B/tie scoring. Overall accuracy counts ties as incorrect.
 Coverage is the fraction of decisions that select an answer, and
@@ -112,9 +114,9 @@ conditional accuracy is accuracy among selected answers. We report
 correct-to-wrong and correct-to-tie transitions among initially correct
 decisions. We average orders and pair instances within question groups,
 then weight questions equally. Intervals use 10,000 paired percentile
-bootstrap draws of question groups within domain. We use the same
-draws for all conditions so that each comparison remains matched.
-Secondary contrasts characterize where the effect changes direction.
+bootstrap draws of question groups, stratified by domain for JudgeBench
+and by source and sample for CALM. We use the same draws for matched
+conditions within each dataset.
 
 \section{Results}
 \input{extension_generated/results}
@@ -133,10 +135,9 @@ effects visible alongside overall accuracy.
 [Replace with confirmed contributions for all four authors.]
 
 \section*{Code and Artifacts}
-The original project is available at
-\url{https://github.com/Solis03/595-proj}. The extension package contains
-the pinned source identifiers, manifests, raw model scores, GPU time
-ledger, and code to regenerate this report's numerical results.
+The project repository is \url{https://github.com/Solis03/595-proj}.
+The evaluation package includes pinned source identifiers, raw model
+scores, and scripts to regenerate the reported measurements.
 
 \bibliography{references}
 

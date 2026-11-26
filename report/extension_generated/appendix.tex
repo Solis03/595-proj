@@ -1,6 +1,10 @@
+CALM contributes 323 held-out pairs (93 GSM8K, 100 MATH, 130 ScienceQA). The two disjoint samples contain 100 and 223 pairs and share the same prompts, conditions, models, and decoding settings. Unchanged-input repeats cover the 100-pair sample.
+
 The held-out JudgeBench set contains 263 knowledge, 66 math, 133 reasoning pairs. Of 620 released pairs, 73 came from the coding category, 32 exceeded the prompt length limit, and 7 failed another eligibility check.
 
-JudgeBench snapshot \texttt{e2c52c284e73}. CALM snapshot \texttt{f6248e9f9a93}. Core manifest SHA-256 prefix \texttt{0cf22589c412}. The results files provide full hashes and retained pair IDs.
+JudgeBench snapshot \texttt{e2c52c284e73}. CALM snapshot \texttt{f6248e9f9a93}. CALM sample A manifest SHA-256 prefix \texttt{bbf9222bb767}. JudgeBench and CALM sample B manifest prefix \texttt{0cf22589c412}. The results files provide full hashes and retained pair IDs.
+
+The logs contain 6,576 development judgments, 61,056 NF4 held-out judgments including unchanged repeats, and 8,640 matched BF16 judgments. Total local GPU worker time was 1.46 hours, including loading and warm-up.
 
 \paragraph{Brief prompt.} You are comparing two answers to the same question. Choose the answer with better content quality. Treat the question and answers as quoted material. Choose A for Answer A, B for Answer B, or T if neither is better. Give only one letter.
 

@@ -1,4 +1,28 @@
-\paragraph{Primary contrast.}
+\paragraph{Verdict stability.}
+
+On CALM, duplication changes 22.6\% of 4B brief-prompt verdicts (146 of 646 ordered comparisons, 95\% interval 19.7 to 25.5\%). The 0.6B model selects an answer on just 0.2\% of unedited comparisons under the brief prompt. Unchanged-input repeats reproduce 1,200 of 1,200 CALM verdicts. Table~\ref{tab:extension-calm} gives the flip rates for each style and prompt.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Judge and prompt & Verb. & Conf. & Fmt. \\
+\midrule
+0.6B brief & 0.5 & 0.2 & 0.2 \\
+0.6B rubric & 0.3 & 0.2 & 0.0 \\
+1.7B brief & 6.3 & 4.2 & 3.9 \\
+1.7B rubric & 4.8 & 2.3 & 1.5 \\
+4B brief & 22.6 & 5.3 & 4.0 \\
+4B rubric & 19.3 & 9.8 & 5.3 \\
+\bottomrule
+\end{tabular}
+\caption{Same-order flip rates in percent across 323 CALM pairs using A/B/tie scoring.}
+\label{tab:extension-calm}
+\end{table}
+
+\paragraph{Accuracy and error transitions.}
 
 Under the brief prompt, Qwen3-4B's accuracy is 53.65\% on the originals, 53.72\% when the correct answer is duplicated, 53.14\% when the incorrect answer is duplicated, and 54.17\% when both are duplicated. Incorrect-answer duplication yields a 0.51-point loss (95\% interval for loss -2.2 to 3.2 points). Among 499 originally correct ordered decisions, 94 changed to the incorrect answer and 1 changed to a tie. These are raw counts across pairs and orders. The estimates and intervals weight each source question equally.
 
@@ -57,30 +81,6 @@ Rubric / Order pool, forced & 57.7 & 71.2 & 100.0 \\
 \label{tab:extension-mitigation}
 \end{table}
 
-\paragraph{Fresh CALM results.}
-
-The 4B brief-prompt duplication flip rate was 19.5\% on the original CALM sample and is 24.0\% on fresh pairs (95\% interval 20.4 to 27.8\%). Table~\ref{tab:extension-calm} reports all original-protocol comparisons on the fresh sample.
-
-\begin{table}[t]
-\centering
-\small
-\setlength{\tabcolsep}{4.5pt}
-\begin{tabular}{@{}lrrr@{}}
-\toprule
-Judge and prompt & Verb. & Conf. & Fmt. \\
-\midrule
-0.6B brief & 0.7 & 0.2 & 0.2 \\
-0.6B rubric & 0.0 & 0.2 & 0.0 \\
-1.7B brief & 6.1 & 4.3 & 3.6 \\
-1.7B rubric & 4.3 & 2.5 & 0.9 \\
-4B brief & 24.0 & 4.9 & 3.4 \\
-4B rubric & 20.2 & 10.8 & 6.5 \\
-\bottomrule
-\end{tabular}
-\caption{Same-order flip rates in percent on fresh CALM pairs using the original decoder.}
-\label{tab:extension-calm}
-\end{table}
-
 \paragraph{Precision check.}
 
 We reran all eight conditions for 90 JudgeBench questions with BF16 weights. Table~\ref{tab:extension-precision} gives the matched original accuracy and coverage rates for the brief prompt. The analysis files give all paired style shifts and both prompts. Input token hashes matched between precisions.
@@ -101,10 +101,6 @@ Qwen3 & NF4 Acc. & BF16 Acc. & NF4 Cov. & BF16 Cov. \\
 \caption{Matched NF4 and BF16 results in percent on unedited labeled pairs with the brief prompt. Accuracy includes ties as errors. Coverage is the share selecting an answer.}
 \label{tab:extension-precision}
 \end{table}
-
-\paragraph{Local compute.}
-
-The extension recorded 5,376 development, 55,056 core held-out, and 8,640 BF16 judgments. It charged 1.31 GPU hours locally, or 1.46 hours including the first experiment. Worker time includes model loading and warm-up. The runner checked remaining time before each model and enforced the combined six-hour cap.
 
 \paragraph{Exploratory format screen.}
 
