@@ -1,0 +1,146 @@
+\documentclass[11pt]{article}
+\usepackage[final]{acl}
+\usepackage[T1]{fontenc}
+\usepackage{times,latexsym,graphicx,booktabs,amsmath,microtype}
+
+\title{When Style Changes Correctness in Small LLM Judges}
+\author{[Author 1] \quad [Author 2] \quad [Author 3] \quad [Author 4] \\
+        {[Affiliations]} \\
+        Team ID [Team ID]}
+
+\input{extension_generated/facts}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\input{extension_generated/abstract}
+\end{abstract}
+
+\section{Introduction}
+Small language models offer a fast way to judge candidate answers. When
+presentation changes a verdict, the consequence depends on whether the
+original and edited verdicts select the correct answer. In our initial
+100-question CALM experiment, duplicating one answer changed 19.5\% of
+Qwen3-4B verdicts under a short prompt. The automatic label checks did
+not establish which answer was better in any of those pairs. The
+0.6B checkpoint also tied on every original comparison, making flip
+rate alone hard to interpret.
+
+We extend the study with \GoldPairs{} JudgeBench answer pairs with
+correctness labels and \CalmPairs{} new CALM questions. In JudgeBench
+we apply each presentation edit to either candidate in separate
+trials. This lets us measure whether the same edit favors a correct
+answer, an incorrect answer, or neither consistently. We also measure
+the effect of a content rubric and of pooling judgments from both answer
+orders. The experiments use the same three locally available Qwen3
+checkpoints and retain the original CALM protocol for replication.
+
+\section{Related Work}
+\citet{zheng2023mtbench} reported position and verbosity effects in
+language-model judges. \citet{wang2024fair} showed that candidate order
+can change rankings. CALM \citep{ye2025calm} used controlled edits to
+measure how often judgments change, including after an LLM lengthened
+a candidate response. reWordBench \citep{wu2025rewordbench} evaluates
+reward models under transformations designed to preserve meaning or
+preference. JudgeBench \citep{tan2025judgebench} supplies objectively
+labeled response pairs and evaluates both orders. We combine labeled
+pairs with mirrored changes to investigate whether style moves judgments
+toward or away from the correct answer.
+
+\section{Data and Method}
+
+\paragraph{JudgeBench.}
+We use the pinned GPT-4o and Claude-3.5-Sonnet response sets and their
+published binary correctness labels. We use the benchmark labels as the
+reference standard. The primary analysis covers knowledge, reasoning,
+and math. Screening excludes executable coding tasks, missing or
+invalid comparison fields, selected explicit formatting requests, and
+pairs that fail edit or length checks. We assign rows with a shared
+upstream question ID or the same normalized question to the same
+group. When an upstream ID is absent, the normalized question identifies
+the group. We reserve 40 groups for development using a fixed
+domain-stratified ordering. The held-out \GoldPairs{} pairs span
+\GoldQuestions{} source-question groups across the two response
+generators. The analysis weights source questions equally.
+
+\paragraph{Fresh CALM replication.}
+We reconstruct the original eligibility rules and retain \CalmPairs{}
+pairs outside both original splits. The new CALM run uses the original,
+verbosity, confidence, and formatting conditions with the same 2,048-token
+limit. We estimate verdict flips and order consistency on this cohort.
+JudgeBench supplies the correctness estimates.
+
+\paragraph{Mirrored edits.}
+For each labeled pair, we construct six single-answer variants by applying
+one of three edits to either the correct or the incorrect answer. We
+repeat the answer verbatim, prepend the one-word confidence marker
+\emph{Certainly.}, or add Markdown bold delimiters around an existing
+prose span. These transformations preserve the original answer text,
+including any error or hedge. A seventh variant repeats both answers,
+which tests what happens when redundancy is added on both sides. The
+original and seven variants make eight conditions per pair. Every
+JudgeBench input fits within 4,096 tokens under both prompts and both
+answer orders. Each case retains all original content.
+
+\paragraph{Judges and decoding.}
+We evaluate Qwen3-0.6B, 1.7B, and 4B \citep{yang2025qwen3} on an RTX
+PRO 6000 Blackwell with four-bit NF4 weights and BF16 computation.
+Inference uses batch size one, deterministic one-token scoring,
+and the non-thinking chat template. The brief prompt asks for the
+answer with better content quality. The rubric prioritizes factual
+or mathematical correctness, completeness, and relevance, and
+asks the judge to ignore presentation cues. The judge receives the
+question and the two ordered candidate answers. Correctness labels
+are used in evaluation after predictions are recorded.
+
+We compare four decoding rules. Ordered A/B/tie evaluates each
+presentation using the largest allowed-token logit. Pooled A/B/tie
+maps the three-way softmax scores to answer identities, averages the
+scores from the two orders, and takes the largest. Forced choice
+restricts scoring to A and B on the same stored logits. We calculate
+it for each order and for the mean of the two-order probabilities.
+Pooling uses two forward passes. The forced-choice variants reuse
+the recorded passes.
+
+\paragraph{Estimands.}
+Our primary contrast is the reduction in accuracy from original to
+incorrect-answer duplication for the 4B judge using the brief prompt
+and ordered A/B/tie scoring. Overall accuracy counts ties as incorrect.
+Coverage is the fraction of decisions that select an answer, and
+conditional accuracy is accuracy among selected answers. We report
+correct-to-wrong and correct-to-tie transitions among initially correct
+decisions. We average orders and pair instances within question groups,
+then weight questions equally. Intervals use 10,000 paired percentile
+bootstrap draws of question groups within domain. We use the same
+draws for all conditions so that each comparison remains matched.
+Secondary contrasts characterize where the effect changes direction.
+
+\section{Results}
+\input{extension_generated/results}
+
+\section{Discussion}
+\input{extension_discussion}
+
+\section{Conclusion}
+Mirrored edits and labeled answer pairs expose errors that cancel in an
+aggregate accuracy score. The rubric's response depends on which answer
+is styled, and pooling can improve clean accuracy while leaving sensitivity
+to edits. Reporting directional error transitions and coverage makes these
+effects visible alongside overall accuracy.
+
+\section*{Division of Work}
+[Replace with confirmed contributions for all four authors.]
+
+\section*{Code and Artifacts}
+The original project is available at
+\url{https://github.com/Solis03/595-proj}. The extension package contains
+the pinned source identifiers, manifests, raw model scores, GPU time
+ledger, and code to regenerate this report's numerical results.
+
+\bibliography{references}
+
+\appendix
+\section{Reproduction Details}
+\input{extension_generated/appendix}
+\end{document}

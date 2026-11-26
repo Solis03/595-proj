@@ -1,0 +1,19 @@
+{
+  "judgebench_screening": {
+    "eligible": 508,
+    "over_token_limit": 32,
+    "invalid_text": 5,
+    "invalid_edit": 2,
+    "coding": 73
+  },
+  "judgebench_hashes": {
+    "gpt-4o-2024-05-13": "d5106306b38dead1b2e964ecf5534a3e7b2fc4b8d3b8da327599edfcebd76042",
+    "claude-3-5-sonnet-20240620": "3b70504588e400613bf5744a20a345da8701b7150be9a30c9db0e6f3d7b70a62"
+  },
+  "development_groups": 40,
+  "development_pairs": 46,
+  "eligible_judgebench_pairs": 508,
+  "eligible_heldout_judgebench_pairs": 462,
+  "eligible_heldout_judgebench_questions": 390,
+  "eligible_fresh_calm_pairs": 223
+}

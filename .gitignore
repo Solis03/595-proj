@@ -12,3 +12,10 @@ results/data/development.json
 results/data/heldout.json
 results/analysis/examples.json
 results/runs/gpu_budget.json
+results/extension/*.sqlite*
+results/extension/data/candidates.json
+results/extension/data/pilot.json
+results/extension/data/core.json
+results/extension/data/precision.json
+results/extension/analysis/examples.json
+results/extension/runs/gpu_budget.json

@@ -51,6 +51,24 @@ finally { Pop-Location }
 
 The source command `python -m style_judges.sources report` downloads the pinned ACL files and the Windows Tectonic zip into `work/latex`. Extract the executable into the same directory before compiling.
 
+## Six-hour correctness extension
+
+The extension applies the same style edits to either the correct or incorrect JudgeBench response. It also evaluates fresh CALM pairs and runs a matched BF16 check when the pilot and remaining budget allow it. The supervisor charges the original run against the six-hour cap and resumes from persisted case keys.
+
+~~~powershell
+$python = '.\.venv\Scripts\python.exe'
+& $python -m style_judges.extension fetch
+& $python -m style_judges.extension prepare
+& $python -m style_judges.extension run
+& $python -m style_judges.extension analyze
+& $python -m style_judges.extension_report
+Push-Location report
+try { & ..\work\latex\tectonic.exe -X compile final_project_extended.tex }
+finally { Pop-Location }
+~~~
+
+The extension uses the same pinned Qwen checkpoints and CALM inputs from the original setup. Its [results](results/extension) include judgment CSVs with question groups, label identities, and token hashes. The case-study text and raw manifests are generated locally. The revised report is available as [a PDF](output/pdf/final_project_extended.pdf) and [editable ACL source](report/final_project_extended.tex).
+
 ## Sources
 
 The CALM release supplies the original answer pairs. Original GSM8K, MATH, and ScienceQA solutions are used only by the data preparation step. Model inputs contain the question and two candidate answers. The report bibliography lists the dataset and benchmark papers.

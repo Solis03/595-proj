@@ -1,0 +1,52 @@
+{
+  "original_gpu_hours": 0.15059000000001915,
+  "extension_gpu_hours": 1.3116361111110826,
+  "total_gpu_hours": 1.462226111111102,
+  "gpu_hours_by_stage": {
+    "pilot": 0.1291886111110863,
+    "core": 1.0145527777777492,
+    "precision": 0.16789472222224705
+  },
+  "pilot_calls": 5376,
+  "core_calls": 55056,
+  "precision_calls": 8640,
+  "judgebench_pairs": 462,
+  "judgebench_questions": 390,
+  "judgebench_domains": {
+    "knowledge": 263,
+    "reasoning": 133,
+    "math": 66
+  },
+  "judgebench_generators": {
+    "claude-3-5-sonnet-20240620": 223,
+    "gpt-4o-2024-05-13": 239
+  },
+  "calm_pairs": 223,
+  "calm_sources": {
+    "ScienceQA": 90,
+    "GSM8K": 62,
+    "MATH": 71
+  },
+  "precision_pairs": 90,
+  "core_manifest_sha256": "0cf22589c412747018cb6cffbf291ee4f198569dbdb92550f9e6df685a1931dc",
+  "format_sensitivity_pairs": 343,
+  "precision_started": true,
+  "core_trimmed": false,
+  "forecast_gpu_hours": 1.6356425970109063,
+  "primary_result": {
+    "cohort": "judgebench",
+    "precision": "nf4",
+    "model": "Qwen3-4B",
+    "prompt": "brief",
+    "rule": "ordered",
+    "condition": "verbosity_incorrect",
+    "metric": "correctness_loss",
+    "estimate": 0.005128205128205128,
+    "ci_low": -0.021794871794871794,
+    "ci_high": 0.03205128205128205,
+    "question_groups": 390,
+    "pairs": 462,
+    "raw_numerator": 7,
+    "raw_denominator": 924
+  }
+}

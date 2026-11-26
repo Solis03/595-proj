@@ -10,6 +10,8 @@ from style_judges.sources import ASSETS, ROOT
 RESULTS = ROOT / "results"
 SEED = 5952026
 MAX_TOKENS = 2048
+EXTENSION_MAX_TOKENS = 4096
+EXTENSION_STAGES = ("pilot", "core", "precision")
 LABELS = ("A", "B", "T")
 ORDERS = ("fixed_first", "target_first")
 STYLES = ("original", "verbosity", "confidence", "formatting")
@@ -62,8 +64,11 @@ def load_tokenizer(model):
 
 
 def render(tokenizer, row, variant, order, prompt):
-    target = row["variants"]["original" if variant == "repeat" else variant]
-    fixed = row["fixed_answer"]
+    if "answer_variants" in row:
+        fixed, target = row["answer_variants"][variant]
+    else:
+        target = row["variants"]["original" if variant == "repeat" else variant]
+        fixed = row["fixed_answer"]
     a, b = (fixed, target) if order == "fixed_first" else (target, fixed)
     user = f"Question:\n{row['question']}\n\nAnswer A:\n{a}\n\nAnswer B:\n{b}\n\nVerdict:"
     return tokenizer.apply_chat_template(

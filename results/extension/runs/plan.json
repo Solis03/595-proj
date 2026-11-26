@@ -1,0 +1,99 @@
+{
+  "cap_seconds": 21600,
+  "original_seconds": 542.1240000000689,
+  "pilot_profile": {
+    "Qwen3-0.6B": {
+      "startup_seconds": 16.343999999808148,
+      "bands": {
+        "512": {
+          "samples": 234,
+          "seconds_per_call": 0.08827134388976265
+        },
+        "1024": {
+          "samples": 320,
+          "seconds_per_call": 0.08827134388976265
+        },
+        "2048": {
+          "samples": 914,
+          "seconds_per_call": 0.08827134388976265
+        },
+        "3072": {
+          "samples": 272,
+          "seconds_per_call": 0.08827134388976265
+        },
+        "4096": {
+          "samples": 52,
+          "seconds_per_call": 0.1126094562043436
+        }
+      }
+    },
+    "Qwen3-1.7B": {
+      "startup_seconds": 17.312000000150874,
+      "bands": {
+        "512": {
+          "samples": 234,
+          "seconds_per_call": 0.05703724990435876
+        },
+        "1024": {
+          "samples": 320,
+          "seconds_per_call": 0.05863082490232773
+        },
+        "2048": {
+          "samples": 914,
+          "seconds_per_call": 0.0822779061984038
+        },
+        "3072": {
+          "samples": 272,
+          "seconds_per_call": 0.11972453757899348
+        },
+        "4096": {
+          "samples": 52,
+          "seconds_per_call": 0.1613995001227595
+        }
+      }
+    },
+    "Qwen3-4B": {
+      "startup_seconds": 19.29700000002049,
+      "bands": {
+        "512": {
+          "samples": 234,
+          "seconds_per_call": 0.068792325049988
+        },
+        "1024": {
+          "samples": 320,
+          "seconds_per_call": 0.0938923435152974
+        },
+        "2048": {
+          "samples": 914,
+          "seconds_per_call": 0.17390002489101608
+        },
+        "3072": {
+          "samples": 272,
+          "seconds_per_call": 0.2784797687329119
+        },
+        "4096": {
+          "samples": 52,
+          "seconds_per_call": 0.38306317502993625
+        }
+      }
+    }
+  },
+  "core_manifest_sha256": "0cf22589c412747018cb6cffbf291ee4f198569dbdb92550f9e6df685a1931dc",
+  "core_forecast": {
+    "by_model": {
+      "Qwen3-0.6B": 1643.9905465561399,
+      "Qwen3-1.7B": 1438.1178125795643,
+      "Qwen3-4B": 2806.2049901035584
+    },
+    "total_seconds": 5888.313349239263
+  },
+  "core_calls": 55056,
+  "core_trimmed": false,
+  "judgebench_pairs": 462,
+  "judgebench_questions": 390,
+  "calm_pairs": 223,
+  "precision_planned": true,
+  "precision_started": true,
+  "precision_forecast_seconds": 1464.584751189646,
+  "precision_completed": true
+}

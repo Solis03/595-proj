@@ -1,0 +1,68 @@
+\paragraph{Net accuracy hides opposing changes.}
+In the primary contrast, incorrect-answer duplication moved 94 of
+499 initially correct 4B verdicts to the incorrect answer, and one to
+a tie. The same edit recovered 88 initially incorrect verdicts. The
+resulting net accuracy loss was small and its interval included zero.
+The conditional error rate captures a failure that the aggregate
+accuracy comparison obscures. The fresh CALM measurement supports this
+distinction. Duplication flipped 24.0\% of 4B brief-prompt verdicts,
+compared with 19.5\% in the original sample. The CALM pairs provide
+evidence of instability on a separate benchmark.
+
+\paragraph{The rubric changes which side benefits.}
+With ordered scoring, the 4B rubric reduces accuracy by 9.0 points
+when the correct answer is duplicated and raises it by 4.5 points
+when the incorrect answer is duplicated. Duplicating both answers
+changes accuracy by less than one point in that setting. Pooling
+amplifies the one-sided effects under the rubric. Its accuracy rises
+from 55.0\% to 69.5\% when the incorrect answer is duplicated and
+falls to 40.5\% when the correct answer is duplicated. These results
+are consistent with a penalty for the repeated answer under this
+prompt. The rubric can therefore improve the score for one style
+placement while degrading it for the mirror placement.
+
+\paragraph{Higher accuracy can coexist with instability.}
+Pooling the two answer orders under the brief prompt raised 4B
+accuracy on original JudgeBench pairs from 53.7\% to 58.6\%. It
+also raised accuracy for incorrect-answer duplication from 53.1\%
+to 56.4\%. The resulting loss from duplication was 2.2 points for
+the pooled rule, compared with 0.5 for the ordered rule, and the
+estimated difference had an interval spanning zero. Similarly,
+forcing 0.6B to select an answer raises its coverage to 100\% on
+original labeled pairs. Its pooled forced-choice accuracy remains
+close to 50\%. Accuracy, conditional error transitions, and coverage
+answer distinct questions about each protocol.
+
+\paragraph{Precision affects abstention.}
+On the 90 matched JudgeBench pairs, switching the 0.6B checkpoint from
+NF4 to BF16 raises brief-prompt coverage on original comparisons from
+47.2\% to 80.0\%. Overall accuracy rises from 25.0\% to 41.1\%.
+Accuracy among selected answers is 52.9\% with NF4 and 51.4\%
+with BF16. Much of the overall accuracy change on this subset
+comes from the smaller share of abstentions.
+
+\paragraph{Concrete errors.}
+In JudgeBench pair \texttt{01c32337}, the incorrect candidate on an
+ABO allele-frequency question gives computed values that disagree
+with its selected choice. Duplicating that candidate causes three
+correct-to-wrong transitions across the 1.7B and 4B configurations.
+In pair \texttt{ff5f3ce7}, the benchmark credits an answer about
+tribute in the Aztec Empire. Adding \emph{Certainly.} to a competing
+explanation based on religious sacrifice produces three
+correct-to-wrong transitions. These cases retain their original
+content under the edits.
+
+\paragraph{Limitations.}
+The benchmark labels evaluate correctness on the included questions.
+The same texts could receive different rankings under a rubric
+that explicitly values concision or ease of reading. A duplicated
+answer occupies more positions in the prompt, so the repetition
+intervention changes both redundancy and token placement. The
+confidence and formatting treatments each use one fixed edit.
+Some questions still specify an answer format. For example, a
+reasoning question about cuts through a pentagon requests a bold
+integer, and an edit also introduces bold text elsewhere. The
+exploratory screen checks how these cases affect the aggregate
+comparison. The three judges belong to one model family, and
+all reported effects are conditional on the selected checkpoint,
+prompt, and decoding rule.

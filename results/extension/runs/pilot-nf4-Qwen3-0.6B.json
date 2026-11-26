@@ -1,0 +1,23 @@
+{
+  "model": "Qwen3-0.6B",
+  "precision": "nf4",
+  "manifest_sha256": "633ce248657a24f234dec4841d65d03ee39109f8f9dc3eb8bacc7b8e1dfd15a7",
+  "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "torch": "2.10.0+cu128",
+  "cuda": "12.8",
+  "transformers": "4.57.6",
+  "warmup_calls_per_session": 6,
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+  "capability": [
+    12,
+    0
+  ],
+  "device_total_bytes": 102613057536,
+  "load_seconds_latest": 4.3439999998081475,
+  "completed": 1792,
+  "bitsandbytes": "0.49.2",
+  "load_peak_allocated_bytes": 879340032,
+  "load_peak_reserved_bytes": 1025507328,
+  "inference_peak_allocated_bytes": 758251008,
+  "inference_peak_reserved_bytes": 1033895936
+}

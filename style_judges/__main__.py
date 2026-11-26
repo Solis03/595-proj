@@ -3,7 +3,7 @@
 import argparse
 from pathlib import Path
 
-from style_judges.protocol import RESULTS
+from style_judges.protocol import EXTENSION_STAGES, RESULTS
 from style_judges.sources import MODELS
 
 
@@ -17,7 +17,10 @@ def main():
     for command in (prepare, run, analyze, worker):
         command.add_argument("--output", type=Path, default=RESULTS)
     for command in (run, worker):
-        command.add_argument("split", choices=("development", "heldout"))
+        splits = ("development", "heldout")
+        if command is worker:
+            splits += EXTENSION_STAGES
+        command.add_argument("split", choices=splits)
         command.add_argument("precision", choices=("nf4", "bf16"), default="nf4", nargs="?")
     worker.add_argument("model", choices=list(MODELS))
     run.add_argument("--model", choices=list(MODELS), help="Run one development checkpoint")

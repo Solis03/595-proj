@@ -16,7 +16,8 @@ import sys
 import time
 
 from style_judges.protocol import (
-    LABELS, MAX_TOKENS, ORDERS, PROMPTS, SEED, VARIANTS, canonical_json, label_ids,
+    EXTENSION_MAX_TOKENS, EXTENSION_STAGES, LABELS, MAX_TOKENS, ORDERS, PROMPTS, SEED,
+    VARIANTS, canonical_json, label_ids,
     load_tokenizer, manifest_path, read_json, render, sha256, token_ids, verdict_identity,
     write_json,
 )
@@ -65,12 +66,17 @@ def get_manifest(split, root):
     signature = manifest.pop("manifest_sha256")
     assert sha256(canonical_json(manifest).encode("utf-8")) == signature
     assert manifest["model_revisions"] == MODELS and manifest["prompts"] == PROMPTS
-    assert manifest["split"] == split and manifest["max_input_tokens"] == MAX_TOKENS
+    limit = EXTENSION_MAX_TOKENS if split in EXTENSION_STAGES else MAX_TOKENS
+    assert manifest["split"] == split and manifest["max_input_tokens"] == limit
+    assert all(0 < row.get("input_limit", MAX_TOKENS) <= limit for row in manifest["rows"])
     return signature, manifest["rows"]
 
 
 def case_keys(rows):
-    return set(product((row["pair_id"] for row in rows), VARIANTS, ORDERS, PROMPTS))
+    return {
+        key for row in rows
+        for key in product((row["pair_id"],), row.get("answer_variants", VARIANTS), ORDERS, PROMPTS)
+    }
 
 
 def rows_for(db, split, precision, signature, model):
@@ -91,6 +97,7 @@ def verdict_logits(row):
 
 def require_complete(db, split, precision, signature, rows, models=MODELS):
     expected = case_keys(rows)
+    limits = {row["pair_id"]: row.get("input_limit", MAX_TOKENS) for row in rows}
     observed_by_model = {}
     for model in models:
         records = rows_for(db, split, precision, signature, model)
@@ -99,7 +106,8 @@ def require_complete(db, split, precision, signature, rows, models=MODELS):
             raise RuntimeError(f"{split} {model} {precision}: {len(observed)} of {len(expected)} rows")
         by_key = {row_key(record): record for record in records}
         for raw in records:
-            assert raw["revision"] == MODELS[model] and 0 < raw["input_tokens"] <= MAX_TOKENS
+            assert raw["revision"] == MODELS[model]
+            assert 0 < raw["input_tokens"] <= limits[raw["pair_id"]]
             assert raw["verdict"] == verdict_identity(raw["label"], raw["answer_order"])
             scores = verdict_logits(raw)
             assert raw["label"] == LABELS[max(range(len(LABELS)), key=scores.__getitem__)]
@@ -116,7 +124,7 @@ def input_case(tokenizer, row, style, order, prompt):
     if not text.endswith("<think>\n\n</think>\n\n"):
         raise ValueError("Qwen non-thinking chat template missing closed think block")
     ids = token_ids(tokenizer, text)
-    if not 0 < len(ids) <= MAX_TOKENS:
+    if not 0 < len(ids) <= row.get("input_limit", MAX_TOKENS):
         raise ValueError(f"{row['pair_id']} input contains {len(ids)} tokens")
     signature = sha256(struct.pack(f"<{len(ids)}I", *ids))
     return ids, signature
@@ -132,7 +140,7 @@ def worker(root, split, precision, model_name):
         raise RuntimeError("CUDA with BF16 support is required")
     device = torch.device("cuda:0")
     signature, rows = get_manifest(split, root)
-    _, dev_rows = get_manifest("development", root)
+    _, dev_rows = get_manifest("pilot" if split in EXTENSION_STAGES else "development", root)
     tokenizer = load_tokenizer(model_name)
     choices = torch.tensor(label_ids(tokenizer), device=device)
     assert (torch.arange(4, device=device, dtype=torch.bfloat16) + 1).cpu().tolist() == [1, 2, 3, 4]
@@ -182,9 +190,11 @@ def worker(root, split, precision, model_name):
     torch.cuda.reset_peak_memory_stats(device)
     warm_cases = sorted(dev_rows, key=lambda row: row["max_prompt_tokens"])
     warm_examples = (warm_cases[0], warm_cases[len(warm_cases) // 2], warm_cases[-1])
-    for example, variant in product(warm_examples, ("original", "verbosity")):
-        ids, _ = input_case(tokenizer, example, variant, "fixed_first", "rubric")
-        evaluate(ids)
+    for example in warm_examples:
+        longest = "verbosity_both" if example.get("cohort") == "judgebench" else "verbosity"
+        for variant in ("original", longest):
+            ids, _ = input_case(tokenizer, example, variant, "fixed_first", "rubric")
+            evaluate(ids)
 
     def update_metadata(completed):
         previous = read_json(metadata_path) if metadata_path.is_file() else {}
@@ -285,6 +295,41 @@ def estimate_heldout(root, precision):
     return result
 
 
+def launch_worker(root, split, precision, model, left, path, ledger):
+    if left < 2:
+        raise TimeoutError("No GPU hours remain")
+    entry = {
+        "split": split, "precision": precision, "model": model,
+        "started_utc": datetime.now(timezone.utc).isoformat(), "status": "running",
+        "elapsed_seconds": 0,
+    }
+    ledger.append(entry)
+    write_json(path, ledger)
+    command = [sys.executable, "-m", "style_judges", "_worker", split, precision, model,
+               "--output", str(root)]
+    started = time.monotonic()
+    status = "failed"
+    try:
+        environment = dict(os.environ, PYTHONUNBUFFERED="1", HF_HUB_OFFLINE="1",
+                           TOKENIZERS_PARALLELISM="false", CUBLAS_WORKSPACE_CONFIG=":4096:8")
+        with subprocess.Popen(command, cwd=ROOT, env=environment) as process:
+            entry["worker_pid"] = process.pid
+            try:
+                write_json(path, ledger)
+                code = process.wait(timeout=max(0.1, left - 1))
+            finally:
+                if process.poll() is None:
+                    process.kill()
+                    process.wait()
+            if code:
+                raise subprocess.CalledProcessError(code, command)
+        status = "complete"
+    finally:
+        entry["elapsed_seconds"] = time.monotonic() - started
+        entry["status"] = status
+        write_json(path, ledger)
+
+
 def supervise(root, split, precision, model=None):
     if split == "heldout" and model is not None:
         raise ValueError("The held-out stage requires the complete model matrix")
@@ -309,38 +354,7 @@ def supervise(root, split, precision, model=None):
                     print(f"Already complete | {split} | {precision} | {active_model}", flush=True)
                     continue
                 left = ledger_remaining(ledger, split)
-                if left < 2:
-                    raise TimeoutError("No GPU hours remain")
-                entry = {
-                    "split": split, "precision": precision, "model": active_model,
-                    "started_utc": datetime.now(timezone.utc).isoformat(), "status": "running",
-                    "elapsed_seconds": 0,
-                }
-                ledger.append(entry)
-                write_json(path, ledger)
-                command = [sys.executable, "-m", "style_judges", "_worker", split, precision, active_model,
-                           "--output", str(root)]
-                started = time.monotonic()
-                status = "failed"
-                try:
-                    environment = dict(os.environ, PYTHONUNBUFFERED="1", HF_HUB_OFFLINE="1",
-                                       TOKENIZERS_PARALLELISM="false", CUBLAS_WORKSPACE_CONFIG=":4096:8")
-                    with subprocess.Popen(command, cwd=ROOT, env=environment) as process:
-                        entry["worker_pid"] = process.pid
-                        try:
-                            write_json(path, ledger)
-                            code = process.wait(timeout=max(0.1, left - 1))
-                        finally:
-                            if process.poll() is None:
-                                process.kill()
-                                process.wait()
-                        if code:
-                            raise subprocess.CalledProcessError(code, command)
-                    status = "complete"
-                finally:
-                    entry["elapsed_seconds"] = time.monotonic() - started
-                    entry["status"] = status
-                    write_json(path, ledger)
+                launch_worker(root, split, precision, active_model, left, path, ledger)
             require_complete(db, split, precision, signature, rows, active_models)
         print(f"Verified {len(expected) * len(active_models)} "
               f"{split} judgments in {precision}.", flush=True)
