@@ -19,3 +19,15 @@ results/extension/data/core.json
 results/extension/data/precision.json
 results/extension/analysis/examples.json
 results/extension/runs/gpu_budget.json
+results/jev/manifest.json
+results/jev/*.sqlite*
+
+.venv-jev/
+results/openai/manifest.json
+results/openai/*.sqlite*
+results/gemini/manifest.json
+results/gemini/*.sqlite*
+results/perplexity/manifest.json
+results/perplexity/*.sqlite*
+results/nimble/manifest.json
+results/nimble/*.sqlite*
