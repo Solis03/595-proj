@@ -1,0 +1,12 @@
+{
+  "pairs": 40,
+  "calls": 800,
+  "model": "nimble-v4.1-max",
+  "input_tokens": 469252,
+  "output_tokens": 1600,
+  "estimated_cost_usd": 0.01877008,
+  "api_latency_mean_ms": 369.3891729210736,
+  "note": "CALM stability only; no gold correctness labels. API latency includes network. Cost excludes lost responses.",
+  "cost_note": "List-price input estimate; excludes cache write/read adjustments and free-tier eligibility, not an invoice.",
+  "model_identity_note": "Requested nimble-v4.1-max; response model checked, no immutable checkpoint hash."
+}

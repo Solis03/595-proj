@@ -1,0 +1,12 @@
+{
+  "status": "smoke_test_only",
+  "model": "jev-1.14.0",
+  "credential_variable": "TYPESAFE_API_KEY_SIXIAN",
+  "calls": 20,
+  "expected_full_calls": 800,
+  "pairs": 1,
+  "input_tokens": 15606,
+  "estimated_cost_usd": 0.0006554519999999999,
+  "note": "20 successful live calls; all probabilities/version validated. No formal experiment conclusions.",
+  "python_validation": "3.13.9; 18 unit tests passed"
+}

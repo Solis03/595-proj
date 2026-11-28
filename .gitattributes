@@ -1,0 +1,9 @@
+
+# Normalize generated decision-model CSV exports on check-in.
+results/jev/**/*.csv text eol=lf
+results/openai/**/*.csv text eol=lf
+results/gemini/**/*.csv text eol=lf
+results/perplexity/**/*.csv text eol=lf
+results/nimble/**/*.csv text eol=lf
+results/decision_comparison/**/*.csv text eol=lf
+results/decision_comparison/*.csv text eol=lf

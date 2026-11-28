@@ -1,0 +1,10 @@
+{
+  "pairs": 40,
+  "calls": 800,
+  "model": "jev-1.14.0",
+  "input_tokens": 659756,
+  "output_tokens": 31200,
+  "estimated_cost_usd": 0.027709752,
+  "api_latency_mean_ms": 145.26478532759938,
+  "note": "CALM stability only; no gold correctness labels. API latency includes network. Cost excludes lost responses."
+}

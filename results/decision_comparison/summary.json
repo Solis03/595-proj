@@ -1,0 +1,65 @@
+{
+  "manifest_sha256": "a20c1ad03d386e47da31dab3b56dadda26c5bf541685f4086a3b54ea5c2fad87",
+  "pairs": 40,
+  "providers": {
+    "jev": {
+      "pairs": 40,
+      "calls": 800,
+      "model": "jev-1.14.0",
+      "input_tokens": 659756,
+      "output_tokens": 31200,
+      "estimated_cost_usd": 0.027709752,
+      "api_latency_mean_ms": 145.26478532759938,
+      "note": "CALM stability only; no gold correctness labels. API latency includes network. Cost excludes lost responses."
+    },
+    "openai": {
+      "pairs": 40,
+      "calls": 800,
+      "model": "gpt-6-luna",
+      "input_tokens": 468140,
+      "output_tokens": 0,
+      "estimated_cost_usd": 0.046814,
+      "api_latency_mean_ms": 222.285022312426,
+      "note": "CALM stability only; no gold correctness labels. API latency includes network. Cost excludes lost responses.",
+      "cost_note": "List-price input estimate; excludes cache write/read adjustments and free-tier eligibility, not an invoice.",
+      "model_identity_note": "Requested named model; API reports served model, not an immutable checkpoint."
+    },
+    "gemini": {
+      "pairs": 40,
+      "calls": 800,
+      "model": "gemini-decision-1",
+      "input_tokens": 479284,
+      "output_tokens": 0,
+      "estimated_cost_usd": 0.0479284,
+      "api_latency_mean_ms": 303.60866084869485,
+      "note": "CALM stability only; no gold correctness labels. API latency includes network. Cost excludes lost responses.",
+      "cost_note": "List-price input estimate; excludes cache write/read adjustments and free-tier eligibility, not an invoice.",
+      "model_identity_note": "Requested gemini-decision-1; API does not report a served checkpoint/version."
+    },
+    "perplexity": {
+      "pairs": 40,
+      "calls": 800,
+      "model": "pplx-decider-v1.3",
+      "input_tokens": 463652,
+      "output_tokens": 800,
+      "estimated_cost_usd": 0.009273040000000001,
+      "api_latency_mean_ms": 254.2429851545603,
+      "note": "CALM stability only; no gold correctness labels. API latency includes network. Cost excludes lost responses.",
+      "cost_note": "List-price input estimate; excludes cache write/read adjustments and free-tier eligibility, not an invoice.",
+      "model_identity_note": "Response model echoes requested name; not independent version verification."
+    },
+    "nimble": {
+      "pairs": 40,
+      "calls": 800,
+      "model": "nimble-v4.1-max",
+      "input_tokens": 469252,
+      "output_tokens": 1600,
+      "estimated_cost_usd": 0.01877008,
+      "api_latency_mean_ms": 369.3891729210736,
+      "note": "CALM stability only; no gold correctness labels. API latency includes network. Cost excludes lost responses.",
+      "cost_note": "List-price input estimate; excludes cache write/read adjustments and free-tier eligibility, not an invoice.",
+      "model_identity_note": "Requested nimble-v4.1-max; response model checked, no immutable checkpoint hash."
+    }
+  },
+  "interpretation": "CALM stability, not correctness. Model-service labels do not identify identical architectures or training."
+}
